@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>文字雨</title>
+	<style>
+		* {padding: 0;margin: 0;}
+		html {overflow: hidden;}
+	</style>
+</head>
+<body>
+	<canvas id="canvas" style="background: #111;" z-index:0></canvas>
+	<div id="divId" style="position: absolute;width:100px;height:50px;z-index:100;display: none;"><input type="text" id="inId" style="background-color: darkgreen;border: 0px;"></div>
+	<script src="jquery-3.3.1.min.js"></script>
+	<script>
+		window.onload=function(){
+			var canvas=document.getElementById('canvas')
+			var context=canvas.getContext('2d')
+			var W=window.innerWidth;
+			var H=window.innerHeight;
+
+			canvas.width=W;
+			canvas.height=H;
+
+			var fontSize=30;
+			var colunms=Math.floor(W/fontSize)
+			var drops=[];
+
+			for(var i=0;i<colunms;i++){
+				drops.push(0)
+			}
+			var str=''
+			//var str="what is your name ?"
+			var strLength=str.length;
+			var r_colunms=colunms-str.length;
+			var totalTime=0;
+
+			function draw(){
+				totalTime+=30;
+
+				var chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890?';
+				var maxPos=chars.length;
+				context.fillStyle='rgba(0,0,0,0.05)'
+				context.fillRect(0,0,W,H)
+				context.font='700 '+fontSize+'px 微软雅黑'
+				context.fillStyle='#00cc33'
+				var count=0;
+
+				for(var i=0;i<colunms;i++){
+					var index=Math.floor(Math.random()*str.length)
+					var x=i*fontSize;
+					var y=drops[i]*fontSize;
+					if(i>=r_colunms/2&&i<(colunms-r_colunms/2))
+					{
+						if(totalTime>=10*1000){
+							if(totalTime>=12*1000){
+								context.fillText(str.charAt(count),x,10*fontSize)
+								document.getElementById('divId').style.display='block'
+								document.getElementById('divId').style.left=(W/2-document.getElementById('divId').offsetWidth)+'px'
+								document.getElementById('divId').style.top='380px'
+							}else{
+								context.fillText(str.charAt(count),x,y)
+							}
+							count++;
+						}else{
+							context.fillText(chars.charAt(Math.floor(Math.random()*maxPos)),x,y)
+						}
+						}else{
+							context.fillText(chars.charAt(Math.floor(Math.random()*maxPos)),x,y)
+						}
+						if(y >=canvas.height&&Math.random()>0.99){
+							drops[i]=0;
+						}
+						drops[i]++;
+					}
+				}
+				function randColor(){
+					var r=Math.floor(Math.random()*256)
+					var g=Math.floor(Math.random()*256)
+					var b=Math.floor(Math.random()*256)
+					return 'rgb('+r+','+g+','+b+')'
+				}
+				draw();
+				setInterval(draw,30);
+				$('#inId').blur(function(){
+					var username=$('#inId').val();
+					//alert(username);
+					$.post('loginServlet',{'username':username},function(data){
+						window.location.href='home.html';
+					})
+				})
+			}
+	</script>
+</body>
+</html>
